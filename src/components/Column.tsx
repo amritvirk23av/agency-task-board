@@ -6,6 +6,7 @@ import { TaskComposer, type ComposerDraft } from './TaskComposer'
 
 interface ColumnProps {
   column: ColumnType
+  count: number
   isEmpty: boolean
   /** the column is empty only because of an active filter */
   isFiltered?: boolean
@@ -19,6 +20,7 @@ interface ColumnProps {
 
 export function Column({
   column,
+  count,
   isEmpty,
   isFiltered,
   isDragActive,
@@ -29,12 +31,24 @@ export function Column({
   const { setNodeRef } = useDroppable({ id: column.id })
 
   return (
-    <section aria-label={column.title} className="flex min-h-0 flex-col px-4 pb-4">
+    <section
+      aria-label={column.title}
+      className="flex flex-col px-4 pb-4 md:min-h-0"
+    >
+      {/* Phone-only header — the meridian takes over on desktop */}
+      <div className="flex items-baseline gap-2 pt-4 pb-1 md:hidden">
+        <span aria-hidden="true" className="size-[6px] rounded-full bg-ink" />
+        <h2 className="label-mono text-ink">{column.title}</h2>
+        <span className="font-mono text-[11px] text-ink-faint tabular-nums">
+          · {String(count).padStart(2, '0')}
+        </span>
+      </div>
+
       <div
         ref={setNodeRef}
         data-drop-active={isDragActive || undefined}
         data-drop-target={isDropTarget || undefined}
-        className="scroll-thin min-h-0 flex-1 overflow-y-auto rounded-lg pt-1 pr-1 transition-colors data-[drop-active]:bg-sunk/50 data-[drop-target]:bg-accent-wash"
+        className="scroll-thin rounded-lg pt-1 pr-1 transition-colors data-[drop-active]:bg-sunk/50 data-[drop-target]:bg-accent-wash md:min-h-0 md:flex-1 md:overflow-y-auto"
       >
         {isEmpty ? (
           <EmptyColumn line={column.emptyLine} filtered={isFiltered} />

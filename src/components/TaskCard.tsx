@@ -80,7 +80,7 @@ export function TaskCardView({
       data-done={isDone || undefined}
       data-dragging={isDragging || undefined}
       data-overlay={isOverlay || undefined}
-      className="group relative touch-none rounded-[10px] border border-rule bg-surface p-3.5 transition-[border-color,box-shadow] hover:border-rule-strong data-[done]:bg-paper data-[dragging]:opacity-40 data-[overlay]:rotate-[1.5deg] data-[overlay]:border-rule-strong data-[overlay]:shadow-[0_12px_28px_-8px_rgba(26,26,23,0.22)]"
+      className="group relative rounded-[10px] border border-rule bg-surface p-3.5 transition-[border-color,box-shadow] hover:border-rule-strong data-[done]:bg-paper data-[dragging]:opacity-40 data-[overlay]:rotate-[1.5deg] data-[overlay]:border-rule-strong data-[overlay]:shadow-[0_12px_28px_-8px_rgba(26,26,23,0.22)] md:touch-none"
     >
       {editing ? (
         <input

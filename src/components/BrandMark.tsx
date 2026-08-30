@@ -25,7 +25,7 @@ export function BrandMark() {
         <span className="text-[15px] font-semibold tracking-tight text-ink">
           {AGENCY.name}
         </span>
-        <span className="label-mono text-[10px] text-ink-faint">
+        <span className="label-mono hidden text-[10px] text-ink-faint sm:inline">
           {AGENCY.boardName}
         </span>
       </div>

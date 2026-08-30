@@ -58,7 +58,14 @@
     line-height: 1.45;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overflow: hidden; /* the board locks to one screen; columns scroll internally */
+  }
+
+  /* On a desktop screen the board locks to the viewport and only the
+     columns scroll; on a phone it stacks and the page scrolls normally. */
+  @media (min-width: 768px) {
+    body {
+      overflow: hidden;
+    }
   }
 
   /* One consistent focus ring, always visible for keyboard users */
@@ -147,5 +154,13 @@
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

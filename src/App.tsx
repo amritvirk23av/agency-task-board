@@ -193,7 +193,10 @@ export default function App() {
               actions={
                 <>
                   <FilterBar filter={filter} onChange={setFilter} />
-                  <span className="mx-1 h-4 w-px bg-rule" aria-hidden="true" />
+                  <span
+                    className="mx-1 hidden h-4 w-px bg-rule md:block"
+                    aria-hidden="true"
+                  />
                   <ResetButton onReset={handleReset} />
                 </>
               }
@@ -212,6 +215,7 @@ export default function App() {
               <Column
                 key={column.id}
                 column={column}
+                count={counts[column.id]}
                 isEmpty={columnTasks.length === 0}
                 isFiltered={filtered && byColumn[column.id].length > 0}
                 isDragActive={activeId !== null}

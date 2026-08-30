@@ -8,9 +8,13 @@ interface TopBarProps {
 
 export function TopBar({ actions }: TopBarProps) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between px-5">
+    <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-5 md:h-14 md:flex-nowrap md:py-0">
       <BrandMark />
-      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex w-full flex-wrap items-center gap-1.5 md:w-auto md:flex-nowrap md:justify-end">
+          {actions}
+        </div>
+      ) : null}
     </header>
   )
 }

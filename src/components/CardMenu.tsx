@@ -42,6 +42,13 @@ export function CardMenu({
     setPos({ top: rect.bottom + 6, left: Math.max(8, left) })
   }, [anchorRef])
 
+  // Move focus into the panel on open, and back to the trigger on close.
+  useEffect(() => {
+    const anchor = anchorRef.current
+    ref.current?.querySelector<HTMLElement>('button, select')?.focus()
+    return () => anchor?.focus()
+  }, [anchorRef])
+
   useEffect(() => {
     function onPointerDown(event: PointerEvent) {
       if (

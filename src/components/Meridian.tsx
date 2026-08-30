@@ -15,7 +15,7 @@ interface MeridianProps {
 */
 export function Meridian({ columns, counts, pulsedColumn }: MeridianProps) {
   return (
-    <div className="relative shrink-0 px-5 pt-5 pb-3">
+    <div className="relative hidden shrink-0 px-5 pt-5 pb-3 md:block">
       <div
         aria-hidden="true"
         className="absolute left-5 right-5 top-[27px] h-px bg-rule-strong"

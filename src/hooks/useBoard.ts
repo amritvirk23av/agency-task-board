@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from 'react'
+import { useEffect, useMemo, useReducer } from 'react'
 import { SEED_TASKS } from '../data/seed'
 import {
   addTask,
@@ -7,11 +7,12 @@ import {
   moveTask,
   reorderWithinColumn,
 } from '../lib/board'
+import { loadTasks, saveTasks } from '../lib/storage'
 import type { ColumnId, Priority, Task } from '../types'
 
 interface BoardState {
   tasks: Task[]
-  /** snapshot taken before the last undoable action (a move or a delete) */
+  /** snapshot taken before the last undoable action (move, delete, or reset) */
   previous: Task[] | null
 }
 
@@ -30,6 +31,7 @@ type BoardAction =
   | { type: 'add'; draft: TaskDraft }
   | { type: 'edit'; taskId: string; patch: TaskPatch }
   | { type: 'delete'; taskId: string }
+  | { type: 'reset' }
   | { type: 'undo' }
 
 function reducer(state: BoardState, action: BoardAction): BoardState {
@@ -49,6 +51,8 @@ function reducer(state: BoardState, action: BoardAction): BoardState {
         tasks: deleteTask(state.tasks, action.taskId),
         previous: state.tasks,
       }
+    case 'reset':
+      return { tasks: SEED_TASKS, previous: state.tasks }
     case 'reorder':
       return {
         tasks: reorderWithinColumn(state.tasks, action.activeId, action.overId),
@@ -71,10 +75,14 @@ function reducer(state: BoardState, action: BoardAction): BoardState {
 }
 
 export function useBoard() {
-  const [state, dispatch] = useReducer(reducer, {
-    tasks: SEED_TASKS,
+  const [state, dispatch] = useReducer(reducer, null, () => ({
+    tasks: loadTasks() ?? SEED_TASKS,
     previous: null,
-  })
+  }))
+
+  useEffect(() => {
+    saveTasks(state.tasks)
+  }, [state.tasks])
 
   const byColumn = useMemo(() => {
     const groups: Record<ColumnId, Task[]> = {

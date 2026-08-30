@@ -16,6 +16,7 @@ import { BoardShell } from './components/BoardShell'
 import { Column } from './components/Column'
 import { FilterBar } from './components/FilterBar'
 import { Meridian } from './components/Meridian'
+import { ResetButton } from './components/ResetButton'
 import { TaskCardView, type TaskPatch } from './components/TaskCard'
 import { TaskList } from './components/TaskList'
 import type { ComposerDraft } from './components/TaskComposer'
@@ -126,6 +127,11 @@ export default function App() {
     if (task) offerUndo(`“${task.title}” deleted.`)
   }
 
+  function handleReset() {
+    withViewTransition(() => dispatch({ type: 'reset' }))
+    offerUndo('Board reset to the sample tasks.')
+  }
+
   function columnOf(id: string): ColumnId | null {
     if (isColumnId(id)) return id
     return tasks.find((task) => task.id === id)?.column ?? null
@@ -184,7 +190,13 @@ export default function App() {
         <BoardShell
           topBar={
             <TopBar
-              actions={<FilterBar filter={filter} onChange={setFilter} />}
+              actions={
+                <>
+                  <FilterBar filter={filter} onChange={setFilter} />
+                  <span className="mx-1 h-4 w-px bg-rule" aria-hidden="true" />
+                  <ResetButton onReset={handleReset} />
+                </>
+              }
             />
           }
           meridian={

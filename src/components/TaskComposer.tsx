@@ -35,8 +35,7 @@ export function TaskComposer({ columnTitle, onAdd }: TaskComposerProps) {
     const trimmed = title.trim()
     if (!trimmed) return
     onAdd({ title: trimmed, priority, assigneeId })
-    setTitle('')
-    inputRef.current?.focus() // stay open for rapid entry
+    close() // close so the new card isn't hidden behind the form
   }
 
   function close() {

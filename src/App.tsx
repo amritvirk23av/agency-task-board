@@ -15,7 +15,7 @@ import { useState } from 'react'
 import { BoardShell } from './components/BoardShell'
 import { Column } from './components/Column'
 import { Meridian } from './components/Meridian'
-import { TaskCardView } from './components/TaskCard'
+import { TaskCardView, type TaskPatch } from './components/TaskCard'
 import { TaskList } from './components/TaskList'
 import type { ComposerDraft } from './components/TaskComposer'
 import { TopBar } from './components/TopBar'
@@ -67,6 +67,16 @@ export default function App() {
   function handleAdd(column: ColumnId, draft: ComposerDraft) {
     withViewTransition(() => dispatch({ type: 'add', draft: { ...draft, column } }))
     announce(`“${draft.title}” added to ${TITLE[column]}.`)
+  }
+
+  function handleEdit(taskId: string, patch: TaskPatch) {
+    dispatch({ type: 'edit', taskId, patch })
+  }
+
+  function handleDelete(taskId: string) {
+    const task = tasks.find((t) => t.id === taskId)
+    withViewTransition(() => dispatch({ type: 'delete', taskId }))
+    if (task) announce(`“${task.title}” deleted.`)
   }
 
   function columnOf(id: string): ColumnId | null {
@@ -144,7 +154,12 @@ export default function App() {
                 isDropTarget={overColumn === column.id}
                 onAddTask={(draft) => handleAdd(column.id, draft)}
               >
-                <TaskList tasks={columnTasks} onMove={handleMove} />
+                <TaskList
+                  tasks={columnTasks}
+                  onMove={handleMove}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
               </Column>
             )
           })}

@@ -3,14 +3,16 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import type { ColumnId, Task } from '../types'
-import { TaskCard } from './TaskCard'
+import { TaskCard, type TaskPatch } from './TaskCard'
 
 interface TaskListProps {
   tasks: Task[]
   onMove: (taskId: string, toColumn: ColumnId) => void
+  onEdit: (taskId: string, patch: TaskPatch) => void
+  onDelete: (taskId: string) => void
 }
 
-export function TaskList({ tasks, onMove }: TaskListProps) {
+export function TaskList({ tasks, onMove, onEdit, onDelete }: TaskListProps) {
   return (
     <SortableContext
       items={tasks.map((task) => task.id)}
@@ -18,7 +20,13 @@ export function TaskList({ tasks, onMove }: TaskListProps) {
     >
       <ul className="flex flex-col gap-2.5">
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} onMove={onMove} />
+          <TaskCard
+            key={task.id}
+            task={task}
+            onMove={onMove}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
         ))}
       </ul>
     </SortableContext>

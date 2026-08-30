@@ -1,5 +1,7 @@
 # Agency Task Board
 
+### ▸ [View the live demo](https://amritvirk23av.github.io/agency-task-board/)
+
 A single-screen operations board for a small agency: three columns — **To Do**,
 **In Progress**, **Done** — with cards you move between them instantly, no page
 reload. Built as a focused UI/UX + React demo: one core interaction (moving a
@@ -8,8 +10,8 @@ drag-and-drop — with a tight set of supporting features around it.
 
 The fictional client is **Meridian Studio**, an eight-person creative agency;
 the board is seeded with a normal Tuesday's work across six client engagements.
-
-**Live:** https://amritvirk23av.github.io/agency-task-board/
+Light and dark themes; a visitor's edits persist for the visit and reset for
+the next one.
 
 ## Features
 

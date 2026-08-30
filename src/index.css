@@ -1,1 +1,140 @@
 @import 'tailwindcss';
+
+/*
+  Design system — "the studio ledger"
+  Warm paper, warm near-black ink, one pine accent reserved for interaction.
+  Tokens are defined once here and consumed as semantic utilities
+  (bg-paper, text-ink, border-rule, font-mono, …) everywhere else.
+*/
+@theme {
+  /* Surfaces */
+  --color-paper: #fbfaf8; /* app background — warm off-white */
+  --color-surface: #ffffff; /* cards — the only true white */
+  --color-sunk: #f4f2ee; /* drop-zone tint, pressed states */
+
+  /* Ink */
+  --color-ink: #1a1a17; /* primary text, slightly warm black */
+  --color-ink-soft: #6b6862; /* secondary text, warm gray */
+  --color-ink-faint: #9c988f; /* tertiary text, disabled */
+
+  /* Lines */
+  --color-rule: #e9e6e0; /* hairline dividers and borders */
+  --color-rule-strong: #d9d5cc;
+
+  /* Accent — pine. Interaction only: focus, primary action, active filter. */
+  --color-accent: #1f5c43;
+  --color-accent-hover: #184a36;
+  --color-accent-wash: #eef3f0;
+
+  /* Priority — conventional, muted to sit on warm paper */
+  --color-priority-low: #6b7f99; /* slate */
+  --color-priority-medium: #bd7f2b; /* amber */
+  --color-priority-high: #b23b30; /* brick red */
+
+  /* Feedback */
+  --color-danger: #b23b30;
+
+  /* Type */
+  --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Motion */
+  --ease-move: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow: hidden; /* the board locks to one screen; columns scroll internally */
+  }
+
+  /* One consistent focus ring, always visible for keyboard users */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Thin, unobtrusive scrollbars inside the columns */
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-rule-strong) transparent;
+  }
+  .scroll-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--color-rule-strong);
+    border-radius: 999px;
+  }
+}
+
+@layer utilities {
+  /* Mono label: uppercase, tracked-out — the instrument-readout layer */
+  .label-mono {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 11px;
+    font-weight: 500;
+  }
+}
+
+/* ---- Keyframes ---- */
+@keyframes dot-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--color-accent);
+  }
+  60% {
+    box-shadow: 0 0 0 6px transparent;
+    background-color: var(--color-accent);
+  }
+  100% {
+    box-shadow: 0 0 0 6px transparent;
+    background-color: var(--color-ink);
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Card-move choreography (View Transitions API) ---- */
+::view-transition-group(*) {
+  animation-duration: 240ms;
+  animation-timing-function: var(--ease-move);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -17,6 +17,7 @@ import { Column } from './components/Column'
 import { Meridian } from './components/Meridian'
 import { TaskCardView } from './components/TaskCard'
 import { TaskList } from './components/TaskList'
+import type { ComposerDraft } from './components/TaskComposer'
 import { TopBar } from './components/TopBar'
 import { COLUMNS } from './data/seed'
 import { useAnnounce } from './hooks/useAnnounce'
@@ -61,6 +62,11 @@ export default function App() {
     withViewTransition(() => dispatch({ type: 'move', taskId, toColumn }))
     pulse(toColumn)
     if (task) announce(`“${task.title}” moved to ${TITLE[toColumn]}.`)
+  }
+
+  function handleAdd(column: ColumnId, draft: ComposerDraft) {
+    withViewTransition(() => dispatch({ type: 'add', draft: { ...draft, column } }))
+    announce(`“${draft.title}” added to ${TITLE[column]}.`)
   }
 
   function columnOf(id: string): ColumnId | null {
@@ -136,6 +142,7 @@ export default function App() {
                 isEmpty={columnTasks.length === 0}
                 isDragActive={activeId !== null}
                 isDropTarget={overColumn === column.id}
+                onAddTask={(draft) => handleAdd(column.id, draft)}
               >
                 <TaskList tasks={columnTasks} onMove={handleMove} />
               </Column>

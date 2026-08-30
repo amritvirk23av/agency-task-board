@@ -1,15 +1,23 @@
 import { useMemo, useReducer } from 'react'
 import { SEED_TASKS } from '../data/seed'
-import { moveTask, reorderWithinColumn } from '../lib/board'
-import type { ColumnId, Task } from '../types'
+import { addTask, moveTask, reorderWithinColumn } from '../lib/board'
+import type { ColumnId, Priority, Task } from '../types'
 
 interface BoardState {
   tasks: Task[]
 }
 
+export interface TaskDraft {
+  title: string
+  priority: Priority
+  assigneeId: string
+  column: ColumnId
+}
+
 type BoardAction =
   | { type: 'move'; taskId: string; toColumn: ColumnId; beforeId?: string | null }
   | { type: 'reorder'; activeId: string; overId: string }
+  | { type: 'add'; draft: TaskDraft }
 
 function reducer(state: BoardState, action: BoardAction): BoardState {
   switch (action.type) {
@@ -26,6 +34,8 @@ function reducer(state: BoardState, action: BoardAction): BoardState {
       return {
         tasks: reorderWithinColumn(state.tasks, action.activeId, action.overId),
       }
+    case 'add':
+      return { tasks: addTask(state.tasks, action.draft).tasks }
     default:
       return state
   }

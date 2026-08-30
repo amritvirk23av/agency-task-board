@@ -2,6 +2,7 @@ import { useDroppable } from '@dnd-kit/core'
 import type { ReactNode } from 'react'
 import type { Column as ColumnType } from '../types'
 import { EmptyColumn } from './EmptyColumn'
+import { TaskComposer, type ComposerDraft } from './TaskComposer'
 
 interface ColumnProps {
   column: ColumnType
@@ -10,8 +11,8 @@ interface ColumnProps {
   isDragActive?: boolean
   /** the dragged card is currently over this column */
   isDropTarget?: boolean
+  onAddTask: (draft: ComposerDraft) => void
   children?: ReactNode
-  footer?: ReactNode
 }
 
 export function Column({
@@ -19,8 +20,8 @@ export function Column({
   isEmpty,
   isDragActive,
   isDropTarget,
+  onAddTask,
   children,
-  footer,
 }: ColumnProps) {
   const { setNodeRef } = useDroppable({ id: column.id })
 
@@ -34,7 +35,9 @@ export function Column({
       >
         {isEmpty ? <EmptyColumn line={column.emptyLine} /> : children}
       </div>
-      {footer ? <div className="pt-2">{footer}</div> : null}
+      <div className="pt-2">
+        <TaskComposer columnTitle={column.title} onAdd={onAddTask} />
+      </div>
     </section>
   )
 }

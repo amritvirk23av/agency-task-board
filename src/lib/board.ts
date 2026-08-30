@@ -11,6 +11,10 @@ export function adjacentColumn(
   return COLUMN_ORDER[next] ?? null
 }
 
+export function isColumnId(value: string): value is ColumnId {
+  return (COLUMN_ORDER as string[]).includes(value)
+}
+
 export function tasksInColumn(tasks: Task[], column: ColumnId): Task[] {
   return tasks.filter((task) => task.column === column)
 }
@@ -32,7 +36,6 @@ export function moveTask(
   const updated: Task = { ...moving, column: toColumn }
 
   if (beforeId == null) {
-    // Append after the last task currently in the target column.
     const lastIndex = findLastIndex(without, (task) => task.column === toColumn)
     if (lastIndex === -1) return [...without, updated]
     return [
@@ -44,11 +47,7 @@ export function moveTask(
 
   const beforeIndex = without.findIndex((task) => task.id === beforeId)
   if (beforeIndex === -1) return [...without, updated]
-  return [
-    ...without.slice(0, beforeIndex),
-    updated,
-    ...without.slice(beforeIndex),
-  ]
+  return [...without.slice(0, beforeIndex), updated, ...without.slice(beforeIndex)]
 }
 
 /** Reorder within a single column (drag to a new slot). */
@@ -86,9 +85,7 @@ export function editTask(
   taskId: string,
   patch: Partial<Pick<Task, 'title' | 'priority' | 'assigneeId'>>,
 ): Task[] {
-  return tasks.map((task) =>
-    task.id === taskId ? { ...task, ...patch } : task,
-  )
+  return tasks.map((task) => (task.id === taskId ? { ...task, ...patch } : task))
 }
 
 export function deleteTask(tasks: Task[], taskId: string): Task[] {

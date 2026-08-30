@@ -31,8 +31,11 @@ the next one.
 - **Undo.** Moving or deleting raises a toast with an Undo action; `Ctrl/Cmd+Z`
   does the same while it is up.
 - **Filter** the whole board by priority and assignee from the top bar.
-- **Persists to `localStorage`,** so a reviewer's changes survive a refresh; a
-  Reset control restores the sample tasks (also undoable).
+- **Light and dark themes.** A warm charcoal, not pure black — the same design
+  tokens, redefined. Follows the system setting; the toggle remembers a choice
+  and is applied before first paint so there's no flash.
+- **Per-visit persistence.** Edits are kept in `sessionStorage`, so they survive
+  a refresh but every fresh visit starts from the clean sample set.
 - Keyboard-navigable throughout, visible focus rings, `prefers-reduced-motion`
   honoured, screen-reader announcements for every board change.
 
@@ -70,7 +73,7 @@ src/
   App.tsx                 # composition root — owns board, filter, drag, and toast state
   components/
     BoardShell.tsx        # viewport-locked page shell; stacks below md
-    TopBar.tsx            # brand, filters, reset
+    TopBar.tsx            # brand, filters, theme toggle
     Meridian.tsx          # the hairline across the board with a coordinate dot per column
     Column.tsx            # droppable column; header, scroll area, composer
     TaskList.tsx          # SortableContext + the cards
@@ -78,13 +81,15 @@ src/
     CardMenu.tsx          # portalled panel: priority, assignee, delete
     TaskComposer.tsx      # inline "add task" form
     FilterBar.tsx         # priority + assignee selects
+    ThemeToggle.tsx       # light / dark switch
     Toast.tsx             # single undo toast
   hooks/
-    useBoard.ts           # useReducer + localStorage + a one-level undo snapshot
+    useBoard.ts           # useReducer + sessionStorage + a one-level undo snapshot
+    useTheme.ts           # mirrors and toggles the .dark class
     useAnnounce.ts        # polite screen-reader announcement channel
   lib/
     board.ts              # pure board operations — move, reorder, add, edit, delete, filter
-    storage.ts            # localStorage load/save with a shape guard
+    storage.ts            # sessionStorage load/save with a shape guard
     motion.ts             # withViewTransition() helper
   data/
     seed.ts               # columns, sample tasks, storage key
@@ -116,6 +121,17 @@ the toast: it reverts the action the toast is describing. A move, then a
 delete, leaves one live toast — undo it and you're back to the state before the
 delete. This matches how the affordance reads ("undo *that*") without the
 weight of a full undo stack the UI never surfaces.
+
+**Persistence is per-visit, and there's no reset.** The board lives in
+`sessionStorage`, so a reviewer's changes survive a refresh but the shared link
+always opens on the clean sample set. That removes the need for a reset
+control — which, on a public demo, is one accidental click from wiping the
+board with nothing to restore it.
+
+**Dark mode redefines the tokens, it doesn't add a second stylesheet.** Every
+colour is a CSS custom property set once for light and again under `.dark`; the
+components never name a colour. The theme class is written before first paint
+by a tiny inline script, so there's no flash on load.
 
 **Priority colour is never the only signal.** The pill is a coloured dot plus an
 ink label. The dot carries conventional slate / amber / red so it's parsed at a

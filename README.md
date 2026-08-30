@@ -9,6 +9,8 @@ drag-and-drop — with a tight set of supporting features around it.
 The fictional client is **Meridian Studio**, an eight-person creative agency;
 the board is seeded with a normal Tuesday's work across six client engagements.
 
+**Live:** https://amritvirk23av.github.io/agency-task-board/
+
 ## Features
 
 - **Three columns locked to one screen.** The page never scrolls on desktop —
@@ -54,9 +56,10 @@ npm run lint     # oxlint
 
 ## Deploying
 
-The build is a static site with no routing, so any static host works. It is
-set up for **Vercel** (Framework preset: Vite, zero config) — import the repo
-and every push to `main` deploys automatically.
+The build is a static site with relative asset paths, so it runs at a domain
+root or under a project path. A GitHub Actions workflow builds and publishes to
+GitHub Pages on every push to `main` (`.github/workflows/deploy.yml`); the same
+`dist` works unchanged on Vercel or Netlify.
 
 ## Project structure
 

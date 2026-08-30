@@ -7,6 +7,8 @@ import { TaskComposer, type ComposerDraft } from './TaskComposer'
 interface ColumnProps {
   column: ColumnType
   isEmpty: boolean
+  /** the column is empty only because of an active filter */
+  isFiltered?: boolean
   /** a drag is in progress somewhere on the board */
   isDragActive?: boolean
   /** the dragged card is currently over this column */
@@ -18,6 +20,7 @@ interface ColumnProps {
 export function Column({
   column,
   isEmpty,
+  isFiltered,
   isDragActive,
   isDropTarget,
   onAddTask,
@@ -33,7 +36,11 @@ export function Column({
         data-drop-target={isDropTarget || undefined}
         className="scroll-thin min-h-0 flex-1 overflow-y-auto rounded-lg pt-1 pr-1 transition-colors data-[drop-active]:bg-sunk/50 data-[drop-target]:bg-accent-wash"
       >
-        {isEmpty ? <EmptyColumn line={column.emptyLine} /> : children}
+        {isEmpty ? (
+          <EmptyColumn line={column.emptyLine} filtered={isFiltered} />
+        ) : (
+          children
+        )}
       </div>
       <div className="pt-2">
         <TaskComposer columnTitle={column.title} onAdd={onAddTask} />

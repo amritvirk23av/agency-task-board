@@ -14,6 +14,7 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BoardShell } from './components/BoardShell'
 import { Column } from './components/Column'
+import { FilterBar } from './components/FilterBar'
 import { Meridian } from './components/Meridian'
 import { TaskCardView, type TaskPatch } from './components/TaskCard'
 import { TaskList } from './components/TaskList'
@@ -23,9 +24,9 @@ import { TopBar } from './components/TopBar'
 import { COLUMNS } from './data/seed'
 import { useAnnounce } from './hooks/useAnnounce'
 import { useBoard } from './hooks/useBoard'
-import { isColumnId } from './lib/board'
+import { isColumnId, isFilterActive, matchesFilter } from './lib/board'
 import { withViewTransition } from './lib/motion'
-import type { ColumnId } from './types'
+import type { ColumnId, Filter } from './types'
 
 const TITLE: Record<ColumnId, string> = {
   todo: 'To Do',
@@ -40,7 +41,20 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overColumn, setOverColumn] = useState<ColumnId | null>(null)
   const [toast, setToast] = useState<ToastState | null>(null)
+  const [filter, setFilter] = useState<Filter>({
+    priority: 'all',
+    assigneeId: 'all',
+  })
   const toastKey = useRef(0)
+
+  const filtered = isFilterActive(filter)
+  const visibleByColumn = {
+    todo: byColumn.todo.filter((task) => matchesFilter(task, filter)),
+    'in-progress': byColumn['in-progress'].filter((task) =>
+      matchesFilter(task, filter),
+    ),
+    done: byColumn.done.filter((task) => matchesFilter(task, filter)),
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -48,9 +62,9 @@ export default function App() {
   )
 
   const counts = {
-    todo: byColumn.todo.length,
-    'in-progress': byColumn['in-progress'].length,
-    done: byColumn.done.length,
+    todo: visibleByColumn.todo.length,
+    'in-progress': visibleByColumn['in-progress'].length,
+    done: visibleByColumn.done.length,
   }
 
   const activeTask = tasks.find((task) => task.id === activeId) ?? null
@@ -168,7 +182,11 @@ export default function App() {
         }}
       >
         <BoardShell
-          topBar={<TopBar />}
+          topBar={
+            <TopBar
+              actions={<FilterBar filter={filter} onChange={setFilter} />}
+            />
+          }
           meridian={
             <Meridian
               columns={COLUMNS}
@@ -177,12 +195,13 @@ export default function App() {
             />
           }
           columns={COLUMNS.map((column) => {
-            const columnTasks = byColumn[column.id]
+            const columnTasks = visibleByColumn[column.id]
             return (
               <Column
                 key={column.id}
                 column={column}
                 isEmpty={columnTasks.length === 0}
+                isFiltered={filtered && byColumn[column.id].length > 0}
                 isDragActive={activeId !== null}
                 isDropTarget={overColumn === column.id}
                 onAddTask={(draft) => handleAdd(column.id, draft)}

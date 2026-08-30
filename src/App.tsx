@@ -11,13 +11,14 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { BoardShell } from './components/BoardShell'
 import { Column } from './components/Column'
 import { Meridian } from './components/Meridian'
 import { TaskCardView, type TaskPatch } from './components/TaskCard'
 import { TaskList } from './components/TaskList'
 import type { ComposerDraft } from './components/TaskComposer'
+import { Toast, type ToastState } from './components/Toast'
 import { TopBar } from './components/TopBar'
 import { COLUMNS } from './data/seed'
 import { useAnnounce } from './hooks/useAnnounce'
@@ -38,6 +39,8 @@ export default function App() {
   const [pulsedColumn, setPulsedColumn] = useState<ColumnId | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overColumn, setOverColumn] = useState<ColumnId | null>(null)
+  const [toast, setToast] = useState<ToastState | null>(null)
+  const toastKey = useRef(0)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -52,6 +55,35 @@ export default function App() {
 
   const activeTask = tasks.find((task) => task.id === activeId) ?? null
 
+  const dismissToast = useCallback(() => setToast(null), [])
+
+  const undo = useCallback(() => {
+    withViewTransition(() => dispatch({ type: 'undo' }))
+    announce('Change reverted.')
+  }, [dispatch, announce])
+
+  const offerUndo = useCallback(
+    (message: string) => {
+      toastKey.current += 1
+      setToast({ key: toastKey.current, message, onUndo: undo })
+    },
+    [undo],
+  )
+
+  // Ctrl/Cmd+Z reverts the last move or delete while its toast is up.
+  useEffect(() => {
+    if (!toast) return
+    function onKey(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault()
+        undo()
+        dismissToast()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [toast, undo, dismissToast])
+
   function pulse(column: ColumnId) {
     setPulsedColumn(column)
     window.setTimeout(() => setPulsedColumn(null), 650)
@@ -61,10 +93,11 @@ export default function App() {
     const task = tasks.find((t) => t.id === taskId)
     withViewTransition(() => dispatch({ type: 'move', taskId, toColumn }))
     pulse(toColumn)
-    if (task) announce(`“${task.title}” moved to ${TITLE[toColumn]}.`)
+    if (task) offerUndo(`“${task.title}” moved to ${TITLE[toColumn]}.`)
   }
 
   function handleAdd(column: ColumnId, draft: ComposerDraft) {
+    dismissToast()
     withViewTransition(() => dispatch({ type: 'add', draft: { ...draft, column } }))
     announce(`“${draft.title}” added to ${TITLE[column]}.`)
   }
@@ -76,7 +109,7 @@ export default function App() {
   function handleDelete(taskId: string) {
     const task = tasks.find((t) => t.id === taskId)
     withViewTransition(() => dispatch({ type: 'delete', taskId }))
-    if (task) announce(`“${task.title}” deleted.`)
+    if (task) offerUndo(`“${task.title}” deleted.`)
   }
 
   function columnOf(id: string): ColumnId | null {
@@ -118,7 +151,7 @@ export default function App() {
       dispatch({ type: 'move', taskId: activeIdStr, toColumn: target }),
     )
     pulse(target)
-    announce(`“${task.title}” moved to ${TITLE[target]}.`)
+    offerUndo(`“${task.title}” moved to ${TITLE[target]}.`)
   }
 
   return (
@@ -164,10 +197,15 @@ export default function App() {
             )
           })}
         />
-        <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.2,0,0,1)' }}>
+        <DragOverlay
+          dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.2,0,0,1)' }}
+        >
           {activeTask ? <TaskCardView task={activeTask} isOverlay /> : null}
         </DragOverlay>
       </DndContext>
+
+      <Toast toast={toast} onDismiss={dismissToast} />
+
       <p aria-live="polite" className="sr-only">
         {message}
       </p>

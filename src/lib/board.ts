@@ -69,9 +69,16 @@ export function reorderWithinColumn(
 
 export function addTask(
   tasks: Task[],
-  draft: { title: string; priority: Priority; assigneeId: string; column: ColumnId },
+  draft: {
+    id?: string
+    title: string
+    priority: Priority
+    assigneeId: string
+    column: ColumnId
+  },
 ): { tasks: Task[]; task: Task } {
-  const task: Task = { id: `t-${crypto.randomUUID().slice(0, 8)}`, ...draft }
+  const { id = `t-${crypto.randomUUID().slice(0, 8)}`, ...rest } = draft
+  const task: Task = { id, ...rest }
   const lastIndex = findLastIndex(tasks, (t) => t.column === draft.column)
   const next =
     lastIndex === -1

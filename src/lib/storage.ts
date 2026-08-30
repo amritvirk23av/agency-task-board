@@ -16,10 +16,15 @@ function isTask(value: unknown): value is Task {
   )
 }
 
-/** Returns the saved board, or null if nothing valid is stored. */
+/*
+  Per-visit persistence: the board is kept in sessionStorage, so a reviewer's
+  edits survive refreshes and in-tab navigation but every fresh visit starts
+  from the clean sample set. That removes the need for a reset control and
+  keeps the shared demo link honest.
+*/
 export function loadTasks(): Task[] | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = sessionStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed) || !parsed.every(isTask)) return null
@@ -31,17 +36,9 @@ export function loadTasks(): Task[] | null {
 
 export function saveTasks(tasks: Task[]): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
   } catch {
-    // storage full or unavailable (private mode) — the board still works
-    // for this session, it just won't survive a reload
-  }
-}
-
-export function clearTasks(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    // nothing to do
+    // storage unavailable (private mode, quota) — the board still works for
+    // this session, it just won't survive a reload
   }
 }

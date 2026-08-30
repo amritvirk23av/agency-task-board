@@ -1,10 +1,14 @@
 @import 'tailwindcss';
 
+/* Manual dark mode: toggled by a `.dark` class on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
   Design system — "the studio ledger"
   Warm paper, warm near-black ink, one pine accent reserved for interaction.
   Tokens are defined once here and consumed as semantic utilities
   (bg-paper, text-ink, border-rule, font-mono, …) everywhere else.
+  The dark theme below redefines the same tokens as a warm charcoal — not black.
 */
 @theme {
   /* Surfaces */
@@ -25,6 +29,7 @@
   --color-accent: #1f5c43;
   --color-accent-hover: #184a36;
   --color-accent-wash: #eef3f0;
+  --color-on-accent: #ffffff;
 
   /* Priority — conventional, muted to sit on warm paper */
   --color-priority-low: #6b7f99; /* slate */
@@ -42,11 +47,42 @@
   --ease-move: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* Dark theme — a warm charcoal, deliberately not pure black */
+.dark {
+  --color-paper: #201d1a;
+  --color-surface: #2a2723;
+  --color-sunk: #191613;
+  --color-ink: #ece6dc;
+  --color-ink-soft: #a8a29a;
+  --color-ink-faint: #8b8478;
+  --color-rule: #363330;
+  --color-rule-strong: #4a4640;
+  --color-accent: #4b9e78;
+  --color-accent-hover: #59ac86;
+  --color-accent-wash: #24312b;
+  --color-on-accent: #14201a;
+  --color-priority-low: #8ea6c6;
+  --color-priority-medium: #d59e56;
+  --color-priority-high: #d97066;
+  --color-danger: #d97066;
+}
+
 @layer base {
   html,
   body,
   #root {
     height: 100%;
+  }
+
+  /* Elevation — only where lift carries meaning (drag, popover, toast).
+     Plain custom properties so the dark values actually cascade. */
+  :root {
+    --shadow-lift: 0 12px 28px -8px rgb(26 26 23 / 0.22);
+    --shadow-pop: 0 16px 36px -12px rgb(26 26 23 / 0.3);
+  }
+  .dark {
+    --shadow-lift: 0 14px 30px -8px rgb(0 0 0 / 0.55);
+    --shadow-pop: 0 18px 40px -12px rgb(0 0 0 / 0.62);
   }
 
   body {
@@ -121,17 +157,6 @@
   }
 }
 
-@keyframes card-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -151,6 +176,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes card-flash {
+  0% {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 0 0 9999px var(--color-accent-wash);
+  }
+  100% {
+    border-color: var(--color-rule);
+    box-shadow: inset 0 0 0 9999px transparent;
   }
 }
 

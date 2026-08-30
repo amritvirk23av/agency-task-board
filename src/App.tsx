@@ -16,10 +16,10 @@ import { BoardShell } from './components/BoardShell'
 import { Column } from './components/Column'
 import { FilterBar } from './components/FilterBar'
 import { Meridian } from './components/Meridian'
-import { ResetButton } from './components/ResetButton'
 import { TaskCardView, type TaskPatch } from './components/TaskCard'
 import { TaskList } from './components/TaskList'
 import type { ComposerDraft } from './components/TaskComposer'
+import { ThemeToggle } from './components/ThemeToggle'
 import { Toast, type ToastState } from './components/Toast'
 import { TopBar } from './components/TopBar'
 import { COLUMNS } from './data/seed'
@@ -35,6 +35,12 @@ const TITLE: Record<ColumnId, string> = {
   done: 'Done',
 }
 
+interface RecentAdd {
+  id: string
+  column: ColumnId
+  key: number
+}
+
 export default function App() {
   const { tasks, byColumn, dispatch } = useBoard()
   const { message, announce } = useAnnounce()
@@ -42,11 +48,13 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overColumn, setOverColumn] = useState<ColumnId | null>(null)
   const [toast, setToast] = useState<ToastState | null>(null)
+  const [recentAdd, setRecentAdd] = useState<RecentAdd | null>(null)
   const [filter, setFilter] = useState<Filter>({
     priority: 'all',
     assigneeId: 'all',
   })
   const toastKey = useRef(0)
+  const addKey = useRef(0)
 
   const filtered = isFilterActive(filter)
   const visibleByColumn = {
@@ -113,7 +121,16 @@ export default function App() {
 
   function handleAdd(column: ColumnId, draft: ComposerDraft) {
     dismissToast()
-    withViewTransition(() => dispatch({ type: 'add', draft: { ...draft, column } }))
+    const id = `t-${crypto.randomUUID().slice(0, 8)}`
+    withViewTransition(() =>
+      dispatch({ type: 'add', draft: { ...draft, column, id } }),
+    )
+    addKey.current += 1
+    setRecentAdd({ id, column, key: addKey.current })
+    window.setTimeout(
+      () => setRecentAdd((current) => (current?.id === id ? null : current)),
+      1400,
+    )
     announce(`“${draft.title}” added to ${TITLE[column]}.`)
   }
 
@@ -125,11 +142,6 @@ export default function App() {
     const task = tasks.find((t) => t.id === taskId)
     withViewTransition(() => dispatch({ type: 'delete', taskId }))
     if (task) offerUndo(`“${task.title}” deleted.`)
-  }
-
-  function handleReset() {
-    withViewTransition(() => dispatch({ type: 'reset' }))
-    offerUndo('Board reset to the sample tasks.')
   }
 
   function columnOf(id: string): ColumnId | null {
@@ -197,7 +209,7 @@ export default function App() {
                     className="mx-1 hidden h-4 w-px bg-rule md:block"
                     aria-hidden="true"
                   />
-                  <ResetButton onReset={handleReset} />
+                  <ThemeToggle />
                 </>
               }
             />
@@ -221,10 +233,14 @@ export default function App() {
                 isFiltered={filtered && byColumn[column.id].length > 0}
                 isDragActive={activeId !== null}
                 isDropTarget={overColumn === column.id}
+                scrollSignal={
+                  recentAdd?.column === column.id ? recentAdd.key : undefined
+                }
                 onAddTask={(draft) => handleAdd(column.id, draft)}
               >
                 <TaskList
                   tasks={columnTasks}
+                  highlightId={recentAdd?.id ?? null}
                   onMove={handleMove}
                   onEdit={handleEdit}
                   onDelete={handleDelete}

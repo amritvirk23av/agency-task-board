@@ -80,7 +80,7 @@ export function CardMenu({
       role="dialog"
       aria-label={`Edit “${task.title}”`}
       style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}
-      className="fixed z-50 rounded-[10px] border border-rule-strong bg-surface p-3 shadow-[0_16px_36px_-12px_rgba(26,26,23,0.3)]"
+      className="fixed z-50 rounded-[10px] border border-rule-strong bg-surface p-3 shadow-[var(--shadow-pop)]"
     >
       <p className="label-mono text-[9px] text-ink-faint">Priority</p>
       <div className="mt-1.5 flex rounded-md border border-rule p-0.5">

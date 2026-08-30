@@ -27,7 +27,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
     <div className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center">
       <div
         role="status"
-        className="pointer-events-auto flex items-center gap-3 rounded-full border border-ink/10 bg-ink py-2 pr-2 pl-4 text-[12px] text-paper shadow-[0_16px_36px_-12px_rgba(26,26,23,0.45)] motion-safe:animate-[toast-in_180ms_var(--ease-move)]"
+        className="pointer-events-auto flex items-center gap-3 rounded-full border border-ink/10 bg-ink py-2 pr-2 pl-4 text-[12px] text-paper shadow-[var(--shadow-pop)] motion-safe:animate-[toast-in_180ms_var(--ease-move)]"
       >
         <span>{toast.message}</span>
         <button

@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
-import type { ReactNode } from 'react'
+import { useCallback, useEffect, useRef, type ReactNode } from 'react'
 import type { Column as ColumnType } from '../types'
 import { EmptyColumn } from './EmptyColumn'
 import { TaskComposer, type ComposerDraft } from './TaskComposer'
@@ -16,6 +16,8 @@ interface ColumnProps {
   isDragActive?: boolean
   /** the dragged card is currently over this column */
   isDropTarget?: boolean
+  /** changes when a task is added here — scroll the new card into view */
+  scrollSignal?: number
   onAddTask: (draft: ComposerDraft) => void
   children?: ReactNode
 }
@@ -28,10 +30,37 @@ export function Column({
   isFiltered,
   isDragActive,
   isDropTarget,
+  scrollSignal,
   onAddTask,
   children,
 }: ColumnProps) {
   const { setNodeRef } = useDroppable({ id: column.id })
+  const scrollRef = useRef<HTMLDivElement | null>(null)
+
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      scrollRef.current = node
+      setNodeRef(node)
+    },
+    [setNodeRef],
+  )
+
+  useEffect(() => {
+    if (scrollSignal === undefined) return
+    // Wait two frames so the new card is laid out (and any View Transition
+    // snapshot has resolved) before measuring scrollHeight.
+    let raf2 = 0
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        const el = scrollRef.current
+        if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+      })
+    })
+    return () => {
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
+    }
+  }, [scrollSignal])
 
   return (
     <section
@@ -49,7 +78,7 @@ export function Column({
       </div>
 
       <div
-        ref={setNodeRef}
+        ref={setRefs}
         data-drop-active={isDragActive || undefined}
         data-drop-target={isDropTarget || undefined}
         className="scroll-thin rounded-lg pt-1 pr-1 transition-colors data-[drop-active]:bg-sunk/50 data-[drop-target]:bg-accent-wash md:min-h-0 md:flex-1 md:overflow-y-auto"

@@ -7,12 +7,19 @@ import { TaskCard, type TaskPatch } from './TaskCard'
 
 interface TaskListProps {
   tasks: Task[]
+  highlightId?: string | null
   onMove: (taskId: string, toColumn: ColumnId) => void
   onEdit: (taskId: string, patch: TaskPatch) => void
   onDelete: (taskId: string) => void
 }
 
-export function TaskList({ tasks, onMove, onEdit, onDelete }: TaskListProps) {
+export function TaskList({
+  tasks,
+  highlightId,
+  onMove,
+  onEdit,
+  onDelete,
+}: TaskListProps) {
   return (
     <SortableContext
       items={tasks.map((task) => task.id)}
@@ -23,6 +30,7 @@ export function TaskList({ tasks, onMove, onEdit, onDelete }: TaskListProps) {
           <TaskCard
             key={task.id}
             task={task}
+            isNew={task.id === highlightId}
             onMove={onMove}
             onEdit={onEdit}
             onDelete={onDelete}

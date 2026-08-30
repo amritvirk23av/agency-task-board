@@ -34,6 +34,8 @@ interface TaskCardViewProps {
   handleProps?: Record<string, unknown>
   isDragging?: boolean
   isOverlay?: boolean
+  /** just added — flash once so it's clear where it landed */
+  isNew?: boolean
 }
 
 export function TaskCardView({
@@ -44,6 +46,7 @@ export function TaskCardView({
   handleProps,
   isDragging,
   isOverlay,
+  isNew,
 }: TaskCardViewProps) {
   const isDone = task.column === 'done'
   const forward = adjacentColumn(task.column, 'forward')
@@ -80,7 +83,8 @@ export function TaskCardView({
       data-done={isDone || undefined}
       data-dragging={isDragging || undefined}
       data-overlay={isOverlay || undefined}
-      className="group relative rounded-[10px] border border-rule bg-surface p-3 transition-[border-color,box-shadow] hover:border-rule-strong data-[done]:bg-paper data-[dragging]:opacity-40 data-[overlay]:rotate-[1.5deg] data-[overlay]:border-rule-strong data-[overlay]:shadow-[0_12px_28px_-8px_rgba(26,26,23,0.22)] md:touch-none"
+      data-new={isNew || undefined}
+      className="group relative cursor-grab rounded-[10px] border border-rule bg-surface p-3 transition-[border-color,box-shadow] hover:border-rule-strong active:cursor-grabbing data-[done]:bg-paper data-[dragging]:opacity-40 data-[new]:motion-safe:animate-[card-flash_1100ms_ease-out] data-[overlay]:rotate-[1.5deg] data-[overlay]:cursor-grabbing data-[overlay]:border-rule-strong data-[overlay]:shadow-[var(--shadow-lift)] md:touch-none"
     >
       {editing ? (
         <input
@@ -121,7 +125,7 @@ export function TaskCardView({
           aria-label={`Edit “${task.title}”`}
           aria-haspopup="dialog"
           aria-expanded={menuOpen}
-          className="absolute right-2 top-2.5 rounded p-1 text-ink-faint opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink-soft focus-visible:opacity-100 data-[open]:opacity-100"
+          className="absolute right-2 top-2 rounded p-1 text-ink-faint transition-colors hover:text-ink-soft data-[open]:text-ink-soft"
           data-open={menuOpen || undefined}
         >
           <MoreHorizontal size={15} strokeWidth={2} aria-hidden="true" />
@@ -213,12 +217,13 @@ function MoveButton({ onClick, ariaLabel, align, children }: MoveButtonProps) {
 
 interface TaskCardProps {
   task: Task
+  isNew?: boolean
   onMove: (taskId: string, toColumn: ColumnId) => void
   onEdit: (taskId: string, patch: TaskPatch) => void
   onDelete: (taskId: string) => void
 }
 
-export function TaskCard({ task, onMove, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, isNew, onMove, onEdit, onDelete }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id })
 
@@ -237,6 +242,7 @@ export function TaskCard({ task, onMove, onEdit, onDelete }: TaskCardProps) {
         onDelete={onDelete}
         handleProps={{ ...attributes, ...listeners }}
         isDragging={isDragging}
+        isNew={isNew}
       />
     </li>
   )

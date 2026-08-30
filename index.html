@@ -7,8 +7,27 @@
     <title>Meridian Studio — Operations Board</title>
     <meta
       name="description"
-      content="Internal task board for Meridian Studio: To Do, In Progress, Done — move cards instantly with no reload."
+      content="A single-screen task board: To Do, In Progress, Done. Move cards with a button or a drag — no reload. Front-end demo."
     />
+    <meta property="og:title" content="Meridian Studio — Operations Board" />
+    <meta
+      property="og:description"
+      content="A single-screen task board: To Do, In Progress, Done. Move cards with a button or a drag — no reload. Front-end demo."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#fbfaf8" />
+
+    <script>
+      // Set the theme before first paint so there's no flash.
+      try {
+        var stored = localStorage.getItem('meridian.theme')
+        var dark =
+          stored === 'dark' ||
+          (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dark) document.documentElement.classList.add('dark')
+      } catch (e) {}
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

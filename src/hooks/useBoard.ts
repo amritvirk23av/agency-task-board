@@ -12,11 +12,12 @@ import type { ColumnId, Priority, Task } from '../types'
 
 interface BoardState {
   tasks: Task[]
-  /** snapshot taken before the last undoable action (move, delete, or reset) */
+  /** snapshot taken before the last undoable action (a move or a delete) */
   previous: Task[] | null
 }
 
 export interface TaskDraft {
+  id?: string
   title: string
   priority: Priority
   assigneeId: string
@@ -31,7 +32,6 @@ type BoardAction =
   | { type: 'add'; draft: TaskDraft }
   | { type: 'edit'; taskId: string; patch: TaskPatch }
   | { type: 'delete'; taskId: string }
-  | { type: 'reset' }
   | { type: 'undo' }
 
 function reducer(state: BoardState, action: BoardAction): BoardState {
@@ -51,8 +51,6 @@ function reducer(state: BoardState, action: BoardAction): BoardState {
         tasks: deleteTask(state.tasks, action.taskId),
         previous: state.tasks,
       }
-    case 'reset':
-      return { tasks: SEED_TASKS, previous: state.tasks }
     case 'reorder':
       return {
         tasks: reorderWithinColumn(state.tasks, action.activeId, action.overId),

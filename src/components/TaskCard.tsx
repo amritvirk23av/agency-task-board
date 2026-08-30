@@ -80,7 +80,7 @@ export function TaskCardView({
       data-done={isDone || undefined}
       data-dragging={isDragging || undefined}
       data-overlay={isOverlay || undefined}
-      className="group relative rounded-[10px] border border-rule bg-surface p-3.5 transition-[border-color,box-shadow] hover:border-rule-strong data-[done]:bg-paper data-[dragging]:opacity-40 data-[overlay]:rotate-[1.5deg] data-[overlay]:border-rule-strong data-[overlay]:shadow-[0_12px_28px_-8px_rgba(26,26,23,0.22)] md:touch-none"
+      className="group relative rounded-[10px] border border-rule bg-surface p-3 transition-[border-color,box-shadow] hover:border-rule-strong data-[done]:bg-paper data-[dragging]:opacity-40 data-[overlay]:rotate-[1.5deg] data-[overlay]:border-rule-strong data-[overlay]:shadow-[0_12px_28px_-8px_rgba(26,26,23,0.22)] md:touch-none"
     >
       {editing ? (
         <input
@@ -142,7 +142,7 @@ export function TaskCardView({
         />
       ) : null}
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-2.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {isDone ? (
             <Check
@@ -157,7 +157,7 @@ export function TaskCardView({
         <Avatar assigneeId={task.assigneeId} />
       </div>
 
-      <div className="mt-2.5 flex items-center justify-between border-t border-rule pt-2.5">
+      <div className="mt-2 flex items-center justify-between border-t border-rule pt-2">
         {back && onMove ? (
           <MoveButton
             onClick={() => onMove(task.id, back)}

@@ -209,12 +209,13 @@ export default function App() {
               pulsedColumn={pulsedColumn}
             />
           }
-          columns={COLUMNS.map((column) => {
+          columns={COLUMNS.map((column, index) => {
             const columnTasks = visibleByColumn[column.id]
             return (
               <Column
                 key={column.id}
                 column={column}
+                index={index}
                 count={counts[column.id]}
                 isEmpty={columnTasks.length === 0}
                 isFiltered={filtered && byColumn[column.id].length > 0}

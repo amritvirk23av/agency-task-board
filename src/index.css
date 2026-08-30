@@ -143,6 +143,17 @@
   }
 }
 
+@keyframes column-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ---- Card-move choreography (View Transitions API) ---- */
 ::view-transition-group(*) {
   animation-duration: 240ms;

@@ -18,7 +18,7 @@ export function TaskList({ tasks, onMove, onEdit, onDelete }: TaskListProps) {
       items={tasks.map((task) => task.id)}
       strategy={verticalListSortingStrategy}
     >
-      <ul className="flex flex-col gap-2.5">
+      <ul className="flex flex-col gap-2">
         {tasks.map((task) => (
           <TaskCard
             key={task.id}

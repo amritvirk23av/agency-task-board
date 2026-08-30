@@ -6,6 +6,8 @@ import { TaskComposer, type ComposerDraft } from './TaskComposer'
 
 interface ColumnProps {
   column: ColumnType
+  /** position in the row — drives the one-time entrance stagger */
+  index: number
   count: number
   isEmpty: boolean
   /** the column is empty only because of an active filter */
@@ -20,6 +22,7 @@ interface ColumnProps {
 
 export function Column({
   column,
+  index,
   count,
   isEmpty,
   isFiltered,
@@ -33,7 +36,8 @@ export function Column({
   return (
     <section
       aria-label={column.title}
-      className="flex flex-col px-4 pb-4 md:min-h-0"
+      style={{ animationDelay: `${index * 55}ms` }}
+      className="flex flex-col px-4 pb-4 motion-safe:animate-[column-enter_450ms_var(--ease-move)_both] md:min-h-0"
     >
       {/* Phone-only header — the meridian takes over on desktop */}
       <div className="flex items-baseline gap-2 pt-4 pb-1 md:hidden">
